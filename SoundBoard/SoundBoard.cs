@@ -4,7 +4,6 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MenuLib;
-using Photon.Voice.Unity;
 using SoundBoard.Sound;
 using SoundBoard.Sound.Models;
 using UnityEngine;

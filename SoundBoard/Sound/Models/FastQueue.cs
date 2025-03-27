@@ -94,15 +94,15 @@ public class FastQueue
     private void IncrementIndex(int amt)
     {
         Interlocked.Add(ref _bigArrayIndex, amt);
-        if (_bigArrayIndex >= _bigArray.Length)
-            Interlocked.Add(ref _bigArrayIndex, -_bigArray.Length);
+        // if (_bigArrayIndex >= _bigArray.Length)
+        //     Interlocked.Add(ref _bigArrayIndex, -_bigArray.Length);
     }
     
     private void IncrementOffset(int amt)
     {
         Interlocked.Add(ref _bigArrayOffset, amt);
-        if (_bigArrayOffset >= _bigArray.Length)
-            Interlocked.Add(ref _bigArrayOffset, -_bigArray.Length);
+        // if (_bigArrayOffset >= _bigArray.Length)
+        //     Interlocked.Add(ref _bigArrayOffset, -_bigArray.Length);
     }
     
     private void Work()
