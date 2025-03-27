@@ -80,9 +80,6 @@ internal sealed class SoundBoard : BaseUnityPlugin
     /// <param name="instance"></param>
     internal void Init(PlayerVoiceChat instance)
     {
-        if (this._soundManager is not null)
-            this._soundManager = null;
-        
         this._soundManager = instance.gameObject.AddComponent<CustomSoundManager>();
 
         foreach (var sound in _sounds)
