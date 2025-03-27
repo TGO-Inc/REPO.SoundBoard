@@ -1,16 +1,95 @@
 using NAudio.Vorbis;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using SoundBoard.Sound.Models;
 using UnityEngine;
 
 namespace SoundBoard.Sound;
 
 public static class AudioHelper
 {
-    public static AudioClip? LoadAudioClipFromByteArray(byte[] data, AudioFileType type,
+    /// <summary>
+    /// Mixes audio from multiple sources into a single buffer.
+    /// </summary>
+    /// <param name="buffer"><see cref="float"/>[]</param>
+    /// <param name="soundManager"><see cref="CustomSoundManager"/></param>
+    public static void MixAudio(float[] buffer, CustomSoundManager soundManager)
+    {
+        var dataLen = buffer.Length;
+        var noMicBuffer = soundManager.AudioBuffer.NewArray(dataLen);
+        var combined = soundManager.StaticSources.Values;
+        
+        foreach (var audio in combined)
+        {
+            var audioBuf = soundManager.AudioBuffer.NewArray(dataLen);
+            audio.Read(audioBuf, dataLen);
+            
+            for (var i = 0; i < dataLen; i++)
+            {
+                buffer[i] += audioBuf[i];
+                noMicBuffer[i] += audioBuf[i];
+            }
+            
+            soundManager.AudioBuffer.FreeArray(audioBuf);
+        }
+        
+        soundManager.OnAudioFrame(noMicBuffer, dataLen);
+    }
+    
+    /// <summary>
+    /// Mixes audio from multiple sources into a single buffer.
+    /// </summary>
+    /// <param name="buffer"><see cref="short"/>[]</param>
+    /// <param name="soundManager"><see cref="CustomSoundManager"/></param>
+    public static void MixAudio(short[] buffer, CustomSoundManager soundManager)
+    {
+        var dataLen = buffer.Length;
+        var noMicBuffer = soundManager.AudioBuffer.NewArray(dataLen);
+        var combined = soundManager.StaticSources.Values;
+        
+        foreach (var audio in combined)
+        {
+            var audioBuf = soundManager.AudioBuffer.NewArray(dataLen);
+            audio.Read(audioBuf, dataLen);
+            
+            for (var i = 0; i < dataLen; i++)
+            {
+                buffer[i] += (short)(audioBuf[i] * short.MaxValue);
+                noMicBuffer[i] += audioBuf[i];
+            }
+            
+            soundManager.AudioBuffer.FreeArray(audioBuf);
+        }
+        
+        soundManager.OnAudioFrame(noMicBuffer, dataLen);
+    }
+
+    /// <summary>
+    /// Converts a byte array to a RawAudio object.
+    /// </summary>
+    /// <param name="data"><see cref="byte"/>[]</param>
+    /// <param name="type"><see cref="AudioFileType"/></param>
+    /// <param name="outputSampleRate"><see cref="int"/></param>
+    /// <param name="outputChannels"><see cref="int"/></param>
+    /// <returns></returns>
+    public static RawAudio? RawAudioFromByteArray(byte[] data, AudioFileType type,
         int outputSampleRate = 48_000, int outputChannels = 1)
     {
         using var ms = new MemoryStream(data);
+        return RawAudioFromByteArray(ms, type, outputSampleRate, outputChannels);
+    }
+    
+    /// <summary>
+    /// Converts a raw audio stream to a RawAudio object.
+    /// </summary>
+    /// <param name="ms"><see cref="MemoryStream"/></param>
+    /// <param name="type"><see cref="AudioFileType"/></param>
+    /// <param name="outputSampleRate"><see cref="int"/></param>
+    /// <param name="outputChannels"><see cref="int"/></param>
+    /// <returns></returns>
+    public static RawAudio? RawAudioFromByteArray(MemoryStream ms, AudioFileType type,
+        int outputSampleRate = 48_000, int outputChannels = 1)
+    {
         ISampleProvider? sampleProvider = null;
         try
         {
@@ -68,7 +147,7 @@ public static class AudioHelper
 
         // Resample if the native format doesn't match desired output.
         if (sampleProvider.WaveFormat.SampleRate != outputSampleRate || sampleProvider.WaveFormat.Channels != outputChannels)
-            sampleProvider = new WdlResamplingSampleProvider(sampleProvider, outputSampleRate).ToMono();
+            sampleProvider = new WdlResamplingSampleProvider(sampleProvider, outputSampleRate);
         
         // Read the entire audio stream into a float list.
         var samplesList = new System.Collections.Generic.List<float>();
@@ -78,31 +157,7 @@ public static class AudioHelper
         while ((samplesRead = sampleProvider.Read(buffer, 0, buffer.Length)) > 0)
             for (var i = 0; i < samplesRead; i++)
                 samplesList.Add(buffer[i]);
-
-        var samples = samplesList.ToArray();
-        var sampleCountPerChannel = samples.Length / outputChannels;
-        var clip = AudioClip.Create("LoadedSoundBoardAudio", sampleCountPerChannel, outputChannels,
-            outputSampleRate, false);
-        clip.SetData(samples, 0);
-        return clip;
-    }
-    
-    private static byte[] GetSamplesWaveData(float[] samples, int samplesCount)
-    {
-        var pcm = new byte[samplesCount * 2];
-        int sampleIndex = 0,
-            pcmIndex = 0;
-
-        while (sampleIndex < samplesCount)
-        {
-            var outsample = (short)(samples[sampleIndex] * short.MaxValue);
-            pcm[pcmIndex] = (byte)(outsample & 0xff);
-            pcm[pcmIndex + 1] = (byte)((outsample >> 8) & 0xff);
-
-            sampleIndex++;
-            pcmIndex += 2;
-        }
-
-        return pcm;
+        
+        return new RawAudio(samplesList.ToArray());
     }
 }

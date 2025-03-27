@@ -78,6 +78,8 @@
       <EmbeddedResource Include="test.mp3" />
       <None Remove="test2.mp3" />
       <EmbeddedResource Include="test2.mp3" />
+      <None Remove="test3.mp3" />
+      <EmbeddedResource Include="test3.mp3" />
     </ItemGroup>
 
 </Project>

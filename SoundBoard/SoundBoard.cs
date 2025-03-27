@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using MenuLib;
-using SoundBoard.Patches;
+using Photon.Voice.Unity;
 using SoundBoard.Sound;
+using SoundBoard.Sound.Models;
 using UnityEngine;
 
 namespace SoundBoard;
@@ -12,19 +14,21 @@ namespace SoundBoard;
 [BepInPlugin(PluginGuid, PluginName, PluginVersion), BepInDependency("nickklmao.menulib", "2.1.1")]
 internal sealed class SoundBoard : BaseUnityPlugin
 {
+    public static SoundBoard Instance { get; private set; } = null!;
+    
     private const string PluginGuid = "tgo.soundboard";
     private const string PluginName = "SoundBoard";
     private const string PluginVersion = "1.0.0.0";
     
     private readonly Harmony _harmony = new Harmony(PluginGuid);
     
-    private static readonly ManualLogSource ManualLogSource = BepInEx.Logging.Logger.CreateLogSource(PluginGuid);
-    public static readonly List<byte[]> CustomSounds = [];
+    private readonly ManualLogSource _manualLogSource = BepInEx.Logging.Logger.CreateLogSource(PluginGuid);
+    private readonly List<byte[]> _customSounds = [];
     
     private void Awake()
     {
-        // Initialize global objects
-        Settings.Init(ManualLogSource);
+        Instance = this;
+        Settings.Init(this._manualLogSource);
 
         MenuAPI.AddElementToLobbyMenu(parent =>
         {
@@ -38,20 +42,71 @@ internal sealed class SoundBoard : BaseUnityPlugin
                 localPosition: new Vector2(0f, 0f));
         });
 
-        var mp3AudioStream = LoadEmbeddedResource("test.mp3");
-        CustomSounds.Add(mp3AudioStream);
+        this._customSounds.Add(LoadEmbeddedResource("test.mp3"));
+        this._customSounds.Add(LoadEmbeddedResource("test2.mp3"));
         
-        _harmony.PatchAll();
-        ManualLogSource.LogInfo($"{PluginName} loaded");
+        var song = LoadEmbeddedResource("test3.mp3");
+        this._customSounds.Add(song);
+        
+        this._harmony.PatchAll();
+        
+        if (this._sounds.Count == 0)
+        {
+            foreach (var sound in  this._customSounds)
+            {
+                var audioSource = AudioHelper.RawAudioFromByteArray(sound, AudioFileType.MP3);
+                if (audioSource is null)
+                    continue;
+                
+                if (sound == song)
+                    _targetTestRawAudio = audioSource;
+                
+                this._manualLogSource.LogInfo($"{PluginName} loaded SOUND");
+                this._sounds.Add(audioSource);
+            }
+        }
+        
+        this._manualLogSource.LogInfo($"{PluginName} loaded");
+    }
+
+    private readonly ConcurrentBag<RawAudio> _sounds = [];
+    private readonly ConcurrentDictionary<Guid, RawAudio> _soundMap = [];
+    private CustomSoundManager? _soundManager;
+    private Guid _targetTestSound;
+    private RawAudio _targetTestRawAudio;
+    
+    /// <summary>
+    /// Initialize the sound manager.
+    /// </summary>
+    /// <param name="instance"></param>
+    internal void Init(PlayerVoiceChat instance)
+    {
+        if (this._soundManager is not null)
+        {
+            this._manualLogSource.LogWarning("ERM? already initialized.");
+            this._soundManager = null;
+        }
+        
+        this._soundManager = instance.gameObject.AddComponent<CustomSoundManager>();
+
+        foreach (var sound in _sounds)
+        {
+            var guid =  this._soundManager.AddStaticSource(sound);
+            if (guid == Guid.Empty)
+                continue;
+            
+            if (sound == _targetTestRawAudio)
+                _targetTestSound = guid;
+            
+            _soundMap.TryAdd(guid, sound);
+        }
+        
+        this._soundManager.Init();
     }
     
     private void TestPlayAudio()
     {
-        ManualLogSource.LogInfo($"{PluginName} CLICK");
-        
-        var customSound = PlayerVoiceChat.instance.GetComponent<CustomSound>() ?? PlayerVoiceChat.instance.gameObject.AddComponent<CustomSound>();
-        customSound.TryInit(CustomSounds.First(), AudioFileType.MP3);
-        customSound.Play();
+        this._soundManager!.Play(_targetTestSound);
     }
     
     private static byte[] LoadEmbeddedResource(string resourceName)

@@ -1,0 +1,14 @@
+namespace SoundBoard.Sound.Models;
+
+public readonly struct Sample(float[] audio, int length)
+{
+    /// <summary>
+    /// The audio data.
+    /// </summary>
+    public readonly float[] Audio = audio;
+    
+    /// <summary>
+    /// The length of the audio data.
+    /// </summary>
+    public readonly int Length = length;
+}
