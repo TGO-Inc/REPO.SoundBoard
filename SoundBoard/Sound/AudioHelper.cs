@@ -29,8 +29,8 @@ public static class AudioHelper
             
             for (var i = 0; i < dataLen; i++)
             {
-                buffer[i] += audioBuf[i];
-                noMicBuffer[i] += audioBuf[i];
+                buffer[i] += audioBuf[i] * 0.5f;
+                noMicBuffer[i] += audioBuf[i] * 0.5f;
             }
             
             soundManager.AudioBuffer.FreeArray(audioBuf);
@@ -57,8 +57,8 @@ public static class AudioHelper
             
             for (var i = 0; i < dataLen; i++)
             {
-                buffer[i] += (short)(audioBuf[i] * short.MaxValue);
-                noMicBuffer[i] += audioBuf[i];
+                buffer[i] += (short)(audioBuf[i] * 0.5f * short.MaxValue);
+                noMicBuffer[i] += audioBuf[i] * 0.5f;
             }
             
             soundManager.AudioBuffer.FreeArray(audioBuf);
