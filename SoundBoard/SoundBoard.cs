@@ -82,10 +82,7 @@ internal sealed class SoundBoard : BaseUnityPlugin
     internal void Init(PlayerVoiceChat instance)
     {
         if (this._soundManager is not null)
-        {
-            this._manualLogSource.LogWarning("ERM? already initialized.");
             this._soundManager = null;
-        }
         
         this._soundManager = instance.gameObject.AddComponent<CustomSoundManager>();
 

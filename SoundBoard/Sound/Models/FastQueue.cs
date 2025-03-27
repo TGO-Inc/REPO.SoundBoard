@@ -3,6 +3,9 @@ using System.Collections.Concurrent;
 
 namespace SoundBoard.Sound.Models;
 
+/// <summary>
+/// Fully thread-safe fast queue for audio data.
+/// </summary>
 public class FastQueue
 {
     private int _bigArrayIndex = 0;
@@ -87,13 +90,27 @@ public class FastQueue
             }
         }
     }
+
+    private void IncrementIndex(int amt)
+    {
+        Interlocked.Add(ref _bigArrayIndex, amt);
+        if (_bigArrayIndex >= _bigArray.Length)
+            Interlocked.Add(ref _bigArrayIndex, -_bigArray.Length);
+    }
+    
+    private void IncrementOffset(int amt)
+    {
+        Interlocked.Add(ref _bigArrayOffset, amt);
+        if (_bigArrayOffset >= _bigArray.Length)
+            Interlocked.Add(ref _bigArrayOffset, -_bigArray.Length);
+    }
     
     private void Work()
     {
         while (_queue.TryDequeue(out var sample))
         {
             WrapCopy(sample.Audio, 0, this._bigArray, this._bigArrayIndex, sample.Length);
-            Interlocked.Add(ref _bigArrayIndex, sample.Length);
+            IncrementIndex(sample.Length);
             this._floatArrayPool.Return(sample.Audio, true);
         }
     }
@@ -124,7 +141,7 @@ public class FastQueue
     {
         this.Work();
         WrapCopy(this._bigArray, this._bigArrayOffset, target, 0, target.Length);
-        Interlocked.Add(ref _bigArrayOffset, target.Length);
+        IncrementOffset(target.Length);
     }
     
     /// <summary>

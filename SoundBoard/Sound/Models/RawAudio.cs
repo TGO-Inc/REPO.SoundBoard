@@ -2,6 +2,10 @@ using System.Collections.Concurrent;
 
 namespace SoundBoard.Sound.Models;
 
+/// <summary>
+/// A raw audio source.
+/// </summary>
+/// <param name="audio"></param>
 public class RawAudio (float[] audio)
 {
     private int _index = 0;

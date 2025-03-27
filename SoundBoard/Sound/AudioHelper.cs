@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace SoundBoard.Sound;
 
-public static class AudioHelper
+/// <summary>
+/// Helper class for audio operations.
+/// </summary>
+internal static class AudioHelper
 {
     /// <summary>
     /// Mixes audio from multiple sources into a single buffer.

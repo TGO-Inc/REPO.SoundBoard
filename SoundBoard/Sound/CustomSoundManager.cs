@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SoundBoard.Sound;
 
+/// <summary>
+/// The master sound manager.
+/// </summary>
 public class CustomSoundManager : MonoBehaviour
 {
     public static CustomSoundManager? Instance { get; private set; }
@@ -96,7 +99,7 @@ public class CustomSoundManager : MonoBehaviour
         
         if (!this.AudioBuffer.HasAtLeast(data.Length))
         {
-            Settings.Instance.Logger.LogWarning("NO AUDIO DATA READY!!");
+            Settings.Instance.Logger.LogWarning("No audio data available.");
             return;
         }
 
