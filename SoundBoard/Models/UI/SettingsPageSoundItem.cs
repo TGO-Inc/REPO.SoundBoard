@@ -1,0 +1,132 @@
+using System.Windows.Input;
+using MenuLib;
+using MenuLib.MonoBehaviors;
+using SoundBoard.Models.Sources;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace SoundBoard.Models.UI;
+
+public class SettingsPageSoundItem
+{
+    private readonly StaticSource _source;
+    private readonly List<MonoBehaviour> _elements = [];
+    private REPOButton? _keyBindButton;
+    private bool buttonBehavior = true;
+
+    private SettingsPageSoundItem(StaticSource source)
+    {
+        _source = source;
+    }
+    
+    private void VolumeChanged(float value) => _source.Volume = value;
+    
+    public IEnumerable<(REPOPopupPage.ScrollViewBuilderDelegate, int paddingTop, int paddingBottom)> Init()
+    {
+        if (_elements.Count > 0)
+            yield break;
+
+        yield return (parent =>
+        {
+            var label = MenuAPI.CreateREPOLabel(Path.GetFileNameWithoutExtension(_source.Name), parent.transform, new Vector2(-3, 0));
+            label.labelTMP.fontSize = 15;
+            label.labelTMP.color = Color.white;
+            label.labelTMP.margin = Vector4.zero;
+            return label.rectTransform;
+        }, 0, 0);
+
+        yield return (parent =>
+        {
+            var volumeSlider = MenuAPI.CreateREPOSlider("Volume", "", VolumeChanged,
+                parent.transform, new Vector2(35, 0), 0f, 200f, 1,
+                100f, barBehavior: REPOSlider.BarBehavior.UpdateWithValue);
+            volumeSlider.labelTMP.fontSize = 12;
+            volumeSlider.transform.localScale = new Vector2(0.85f, 0.8f);
+            return volumeSlider.rectTransform;
+        }, -10, 0);
+        
+        yield return (parent =>
+        {
+            var button = MenuAPI.CreateREPOToggle("Behavior", s => buttonBehavior = s, parent.transform, new Vector2(35, 0),
+                "Toggle", "Play", true);
+            button.labelTMP.transform.localScale = new Vector2(0.8f, 0.8f);
+            button.labelTMP.transform.localPosition -= new Vector3(23, 0, 0);
+            button.transform.localScale = new Vector2(0.85f, 0.8f);
+            return button.rectTransform;
+        }, -6, 0);
+        
+        yield return (parent =>
+        {
+            _keyBindButton = MenuAPI.CreateREPOButton("F1", () => Entry.SoundBoard.GetNewKeyBind(OnKeyBindChanged), parent.transform, new Vector2(-5, 0));
+            _keyBindButton.labelTMP.fontSize = 28;
+
+            {
+                const float borderThickness = 1.25f;
+                var borderColor = new Color(12f/256,76f/256,200f/256, 1f);
+                var padding = new Vector2(0f, -5f); 
+                
+                // Get the RectTransform of the text
+                var textRect = _keyBindButton.labelTMP.GetComponent<RectTransform>();
+
+                // Create a container for the borderlines as a sibling of the text
+                var borderContainer = new GameObject("BorderContainer");
+                borderContainer.transform.SetParent(textRect.parent, false);
+                // Ensure the border is drawn behind the text
+                borderContainer.transform.SetAsFirstSibling();
+
+                // Set up the container to have the same position as the text,
+                // with extra padding if needed.
+                var containerRect = borderContainer.AddComponent<RectTransform>();
+                containerRect.anchorMin = textRect.anchorMin;
+                containerRect.anchorMax = textRect.anchorMax;
+                containerRect.pivot = textRect.pivot;
+                containerRect.anchoredPosition = textRect.anchoredPosition + new Vector2(1, 1.5f);
+                containerRect.sizeDelta = textRect.sizeDelta + padding;
+
+                // Create four borderlines
+                CreateLine(borderContainer.transform, new Vector2(0, 1), new Vector2(1, 1), borderThickness, borderColor, "TopLine");
+                CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(1, 0), borderThickness, borderColor, "BottomLine");
+                CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(0, 1), borderThickness, borderColor, "LeftLine");
+            }
+            
+            return _keyBindButton.rectTransform;
+        }, -40, 0);
+
+        yield return (parent => MenuAPI.CreateREPOSpacer(parent).rectTransform, 5, 0);
+    }
+
+    private static void CreateLine(Transform parent, Vector2 anchorMin, Vector2 anchorMax, float thickness, Color color, string name)
+    {
+        var line = new GameObject(name);
+        line.transform.SetParent(parent, false);
+        var img = line.AddComponent<Image>();
+        img.color = color;
+        var rt = line.GetComponent<RectTransform>();
+        rt.anchorMin = anchorMin;
+        rt.anchorMax = anchorMax;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+
+        // For vertical lines, set width; for horizontal, set height
+        if (Mathf.Approximately(anchorMin.x, anchorMax.x))
+        {
+            // Vertical line
+            rt.sizeDelta = new Vector2(thickness, 0);
+        }
+        else if (Mathf.Approximately(anchorMin.y, anchorMax.y))
+        {
+            // Horizontal line
+            rt.sizeDelta = new Vector2(0, thickness);
+        }
+    }
+    
+    private void OnKeyBindChanged(ConsoleKey key)
+    {
+        if (_keyBindButton is null)
+            return;
+
+        _keyBindButton.labelTMP.text = key.ToString();
+    }
+
+    public static SettingsPageSoundItem CreateAndBind(StaticSource source) => new(source);
+}
