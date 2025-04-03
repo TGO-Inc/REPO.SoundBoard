@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SoundBoard.Internal.Patches;
 
 [HarmonyPatch(typeof(MenuPageSettings))]
-public class MenuPageSettingsPatch
+internal class MenuPageSettingsPatch
 {
     private static REPOPopupPage SoundBoardPage { get; set; } = null!;
     private static Core.SoundBoard SoundBoard => Entry.SoundBoard;
@@ -16,7 +16,7 @@ public class MenuPageSettingsPatch
     
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
-    public static void Start(MenuPageSettings __instance)
+    private static void Start(MenuPageSettings __instance)
     {
         Transform? child = null;
         float spacing = 0;

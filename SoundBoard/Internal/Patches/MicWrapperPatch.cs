@@ -12,7 +12,7 @@ internal class MicWrapperPatch
     
     [HarmonyPostfix]
     [HarmonyPatch("Read")]
-    public static void Read(MicWrapper __instance, float[] buffer, ref bool __result)
+    private static void Read(MicWrapper __instance, float[] buffer, ref bool __result)
     {
         // if (!__result || SoundEngine is null)
         //     return;

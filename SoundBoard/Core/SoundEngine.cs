@@ -49,22 +49,10 @@ public class SoundEngine : MonoBehaviour
         this._recorder.UseOnAudioFilterRead = IsAnyAudioPlaying;
     }
     
-    // /// <summary>
-    // /// Static audio data callback.
-    // /// </summary>
-    // /// <param name="data"><see cref="float"/>[]</param>
-    // internal void OnAudioFrame(float[] data) 
-    //     => this._audioBuffer.Add(new AudioSample(data, data.Length));
-    
     /// <summary>
     /// Checks all static sources for any active audio.
     /// </summary>
     public static bool IsAnyAudioPlaying => SoundBoard.Sounds.Any(sound => sound.IsPlaying);
-
-    /// <summary>
-    /// The required frame size for client audio playback.
-    /// </summary>
-    public long RequiredFrameSize { get; private set; } = 1024;
     
     /// <summary>
     /// This is for client-side playback
@@ -75,22 +63,22 @@ public class SoundEngine : MonoBehaviour
     {
         if (Instance is null)
             return;
-        
-        var len = data.Length / channels;
-        if (this.RequiredFrameSize != len)
-            this.RequiredFrameSize = len;
-        
-        var tmp = this.MemManager.NewArray(len);
+
+        var flen = data.Length;
+        var len = flen / channels;
+        float[]? tmp = null;
 
         foreach (var sound in SoundBoard.Sounds.Where(s => s.IsPlaying))
         {
+            tmp ??= this.MemManager.NewArray(len);
             var vol = sound.LogVolume;
             sound.Source.Read(tmp, 48_000, false);
-            for (var i = 0; i < data.Length; i++)
+            for (var i = 0; i < flen; i++)
                 data[i] += tmp[i / channels] * vol;
         }
         
-        this.MemManager.FreeArray(tmp);
+        if (tmp is not null)
+            this.MemManager.FreeArray(tmp);
     }
 
     private void OnDestroy()

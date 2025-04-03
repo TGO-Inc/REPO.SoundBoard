@@ -1,8 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using Shared.Game;
+using SoundBoard.Core.Services;
 using SoundBoard.Internal.Helpers;
 using SoundBoard.Models.Audio;
+using SoundBoard.Models.UI;
+using UnityEngine;
 
 namespace SoundBoard.Core;
 
@@ -12,12 +15,15 @@ namespace SoundBoard.Core;
 internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
 {
     public UserSound[] Sounds = [];
+    public readonly ConfigFileService FileService = new(Path.Combine(AudioDirectory, "audio.conf"));
+    
     private readonly ConcurrentBag<UserSound> _sounds = [];
-    private readonly Dictionary<ConsoleKey, List<UserSound>> _soundsByKey = [];
+    private readonly Dictionary<KeyCode, List<UserSound>> _soundsByKey = [];
     private SoundEngine? _soundEngine;
 
     protected override void Awake()
     {
+        FileService.Load();
         Task.Run(PreLoadAudioFiles);
         Keyboard.OnKeyStateChanged += OnKeyStateChanged;
         Entry.LogSource.LogInfo($"Finished setup.");
@@ -33,6 +39,8 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
     {
         if (this._sounds.Count != 0) return;
 
+        FileService.Load();
+        
         foreach (var path in FetchValidFiles())
         {
             var userSound = UserSound.CreateFromPath(path, OnChangeKeyBind);
@@ -54,14 +62,12 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
         // TODO: Implement fetching audio files.
         var directoryInfo = new DirectoryInfo(AudioDirectory);
 
-        // Logger.LogInfo($"Searching in \"{directoryInfo.FullName}\"...");
-        
         foreach (var file in directoryInfo.GetFiles())
             if (AudioFile.SupportedExtensions.ContainsKey(file.Extension.ToLowerInvariant()))
                 yield return file.FullName;
     }
 
-    public void GetNewKeyBind(Action<ConsoleKey> callback)
+    public void GetNewKeyBind(Action<KeyCode> callback)
     {
         if (this._newKeyBind != null)
             return;
@@ -74,8 +80,8 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
         this._newKeyBind = null;
     }
 
-    private Action<ConsoleKey>? _newKeyBind = null;
-    private void OnKeyStateChanged(ConsoleKey key, bool state)
+    private Action<KeyCode>? _newKeyBind = null;
+    private void OnKeyStateChanged(KeyCode key, bool state)
     {
         if (!state)
             return;
@@ -93,14 +99,13 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
             sound.Signal();
     }
     
-    private void OnChangeKeyBind(UserSound sound, ConsoleKey newKey)
+    private void OnChangeKeyBind(UserSound sound, KeyCode newKey)
     {
         // remove old
         foreach (var item in 
                  this._soundsByKey.Where(item => item.Value.Contains(sound)))
             item.Value.Remove(sound);
         
-        Entry.LogSource.LogWarning("New keybind: " + newKey + " for " + sound.Name);
         // add new
         if (this._soundsByKey.TryGetValue(newKey, out var userSounds))
             userSounds.Add(sound);
@@ -108,6 +113,6 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
             this._soundsByKey.Add(newKey, [sound]);
     }
     
-    protected override void FixedUpdate() => Keyboard.Poll();
+    protected override void Update() => Keyboard.Poll();
 }
 

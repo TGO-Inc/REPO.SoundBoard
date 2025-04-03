@@ -16,7 +16,7 @@ internal class MicWrapperPusherPatch
     
     [HarmonyPrefix]
     [HarmonyPatch("SetCallback")]
-    public static void SetCallback(MicWrapperPusher __instance, ref Action<float[]> callback)
+    private static void SetCallback(MicWrapperPusher __instance, ref Action<float[]> callback)
     {
         var original = callback;
         callback = buffer =>
@@ -37,7 +37,7 @@ internal class MicWrapperPusherPatch
     
     [HarmonyPostfix]
     [HarmonyPatch(MethodType.Constructor, typeof(GameObject), typeof(string), typeof(int), typeof(ILogger))]
-    public static void Constructor(MicWrapperPusher __instance, ref int ___channels)
+    private static void Constructor(MicWrapperPusher __instance, ref int ___channels)
     {
         OldChannels.TryAdd(__instance, ___channels);
         // var field = __instance.GetType().GetField("onRead");

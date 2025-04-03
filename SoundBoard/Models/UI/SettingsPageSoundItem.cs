@@ -8,33 +8,29 @@ namespace SoundBoard.Models.UI;
 
 public class SettingsPageSoundItem : ISoundItem
 {
-    public readonly string Name;
-    public float Volume;
-    public ConsoleKey Key;
-    public bool State;
+    private SoundItemConfig _config;
     
-    public event Action<ConsoleKey>? OnKeyBindChanged;
+    public event Action<KeyCode>? OnKeyBindChanged;
     public event Action<float>? OnVolumeChanged;
     public event Action<bool>? OnBehaviorChanged;
     
     private REPOButton? _keyBindButton;
-    private SettingsPageSoundItem(string name, float volume, ConsoleKey key, bool state)
+    private SettingsPageSoundItem(SoundItemConfig config)
     {
-        Name = name;
-        Volume = volume;
-        Key = key;
-        State = state;
+        _config = config;
     }
     
     private void VolumeChanged(float volume)
     {
-        Volume = volume;
+        _config.Volume = volume;
+        Entry.SoundBoard.FileService.UpdateSoundItem(_config.Name, _config);
         this.OnVolumeChanged?.Invoke(volume);
     }
     
     private void BehaviorChanged(bool behavior)
     {
-        State = behavior;
+        _config.State = behavior;
+        Entry.SoundBoard.FileService.UpdateSoundItem(_config.Name, _config);
         this.OnBehaviorChanged?.Invoke(behavior);
     }
     
@@ -42,7 +38,7 @@ public class SettingsPageSoundItem : ISoundItem
     {
         yield return (parent =>
         {
-            var label = MenuAPI.CreateREPOLabel(Name, parent.transform, new Vector2(-3, 0));
+            var label = MenuAPI.CreateREPOLabel(_config.Name, parent.transform, new Vector2(-3, 0));
             label.labelTMP.fontSize = 15;
             label.labelTMP.color = Color.white;
             label.labelTMP.margin = Vector4.zero;
@@ -53,7 +49,7 @@ public class SettingsPageSoundItem : ISoundItem
         {
             var volumeSlider = MenuAPI.CreateREPOSlider("Volume", "", VolumeChanged,
                 parent.transform, new Vector2(35, 0), 0f, 200f, 1,
-                Volume, barBehavior: REPOSlider.BarBehavior.UpdateWithValue);
+                _config.Volume, barBehavior: REPOSlider.BarBehavior.UpdateWithValue);
             
             volumeSlider.labelTMP.fontSize = 12;
             volumeSlider.transform.localScale = new Vector2(0.85f, 0.8f);
@@ -63,7 +59,7 @@ public class SettingsPageSoundItem : ISoundItem
         yield return (parent =>
         {
             var button = MenuAPI.CreateREPOToggle("Behavior", BehaviorChanged, parent.transform, new Vector2(35, 0),
-                "Play", "Toggle", State);
+                "Play", "Toggle", _config.State);
             button.labelTMP.transform.localScale = new Vector2(0.8f, 0.8f);
             button.labelTMP.transform.localPosition -= new Vector3(23, 0, 0);
             button.transform.localScale = new Vector2(0.85f, 0.8f);
@@ -81,8 +77,8 @@ public class SettingsPageSoundItem : ISoundItem
             
             _keyBindButton.labelTMP.fontSize = 28;
             _keyBindButton.overrideButtonSize = new Vector2(34.5f, 40);
-
-            KeyBindChanged(Key, false);
+            
+            KeyBindChanged(_config.Key, false);
             
             {
                 const float borderThickness = 1.25f;
@@ -112,15 +108,11 @@ public class SettingsPageSoundItem : ISoundItem
                 CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(1, 0), borderThickness, borderColor, "BottomLine");
                 CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(0, 1), borderThickness, borderColor, "LeftLine");
             }
-
-            throw new ApplicationException("Some exception here");
             
             return _keyBindButton.rectTransform;
         }, -40, 0);
 
         yield return (parent => MenuAPI.CreateREPOSpacer(parent).rectTransform, 5, 0);
-        
-        
     }
 
     private static void CreateLine(Transform parent, Vector2 anchorMin, Vector2 anchorMax, float thickness, Color color, string name)
@@ -148,7 +140,7 @@ public class SettingsPageSoundItem : ISoundItem
         }
     }
     
-    private void KeyBindChanged(ConsoleKey key, bool signal = true)
+    private void KeyBindChanged(KeyCode key, bool signal = true)
     {
         if (signal)
             this.OnKeyBindChanged?.Invoke(key);
@@ -156,9 +148,12 @@ public class SettingsPageSoundItem : ISoundItem
         if (_keyBindButton is null)
             return;
 
+        _config.Key = key;
+        Entry.SoundBoard.FileService.UpdateSoundItem(_config.Name, _config);
+        
         var str = key switch
         {
-            ConsoleKey.NoName => "_",
+            KeyCode.None => "_",
             _ => key.ToString()
         };
         _keyBindButton.labelTMP.text = str;
@@ -170,7 +165,7 @@ public class SettingsPageSoundItem : ISoundItem
         for (var i = 0; i < iterations; i++)
         {
             // Calculate font size: 28 -> 24 -> 20 -> 18 -> 16
-            var fontSize = startingFontSize - i * 3;
+            var fontSize = startingFontSize - i * 4;
             _keyBindButton.labelTMP.fontSize = fontSize;
         
             // Calculate length threshold: 2 -> 4 -> 6 -> 8 -> 10
@@ -181,12 +176,12 @@ public class SettingsPageSoundItem : ISoundItem
         }
     }
 
-    public static SettingsPageSoundItem CreateAndBind(SoundItemInit soundItemInit)
+    public static SettingsPageSoundItem CreateAndBind(SoundItemConfig soundItemConfig, Action<KeyCode> onKeyBindChanged, Action<float> onVolumeChanged, Action<bool> onBehaviorChanged)
     {
-        var item = new SettingsPageSoundItem(soundItemInit.Name, soundItemInit.Volume, soundItemInit.Key, soundItemInit.State);
-        item.OnKeyBindChanged += soundItemInit.OnKeyBindChanged;
-        item.OnVolumeChanged += soundItemInit.OnVolumeChanged;
-        item.OnBehaviorChanged += soundItemInit.OnBehaviorChanged;
+        var item = new SettingsPageSoundItem(soundItemConfig);
+        item.OnKeyBindChanged += onKeyBindChanged;
+        item.OnVolumeChanged += onVolumeChanged;
+        item.OnBehaviorChanged += onBehaviorChanged;
         return item;
     }
 }

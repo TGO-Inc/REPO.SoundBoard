@@ -11,7 +11,7 @@ internal class PlayerVoiceChatPatch
     
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
-    public static void Start(PlayerVoiceChat __instance, PhotonView ___photonView)
+    private static void Start(PlayerVoiceChat __instance, PhotonView ___photonView)
     {
         if (!___photonView.IsMine) return;
         Entry.SoundBoard.RegisterSoundEngine(__instance);
@@ -19,7 +19,7 @@ internal class PlayerVoiceChatPatch
 
     [HarmonyPrefix]
     [HarmonyPatch("FixedUpdate")]
-    public static void FixedUpdate(PlayerVoiceChat __instance, PhotonView ___photonView, ref float ___isTalkingTimer, ref bool ___isTalking)
+    private static void FixedUpdate(PlayerVoiceChat __instance, PhotonView ___photonView, ref float ___isTalkingTimer, ref bool ___isTalking)
     {
         if (!___photonView.IsMine) return;
 

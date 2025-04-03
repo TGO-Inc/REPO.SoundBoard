@@ -12,7 +12,7 @@ internal class WindowsAudioInPusherPatch
     
     [HarmonyPrefix]
     [HarmonyPatch("SetCallback")]
-    public static void SetCallback(WindowsAudioInPusher __instance, ref Action<short[]> callback)
+    private static void SetCallback(WindowsAudioInPusher __instance, ref Action<short[]> callback)
     {
         var original = callback;
         callback = buffer =>

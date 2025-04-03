@@ -29,7 +29,6 @@ public static class AudioMixer
             if (amt == 0)
             {
                 sound.Stop();
-                Entry.LogSource.LogWarning("Audio stream has reached the end!");
                 continue;
             }
 
