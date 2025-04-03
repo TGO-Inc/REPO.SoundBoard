@@ -16,12 +16,12 @@ public interface IAudioStream
     /// The current position in the stream.
     /// </summary>
     long Position { get; }
-    
+
     /// <summary>
     /// Has the stream reached the end?
     /// </summary>
-    bool EndOfStream => Position >= Length && Length > 0;
-    
+    bool EndOfStream { get; }
+
     /// <summary>
     /// Resets the stream to the beginning.
     /// </summary>

@@ -18,7 +18,7 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
 
     protected override void Awake()
     {
-        this.PreLoadAudioFiles();
+        Task.Run(PreLoadAudioFiles);
         Keyboard.OnKeyStateChanged += OnKeyStateChanged;
         Entry.LogSource.LogInfo($"Finished setup.");
     }
@@ -96,9 +96,9 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
     private void OnChangeKeyBind(UserSound sound, ConsoleKey newKey)
     {
         // remove old
-        foreach (var (_, soundList) in this._soundsByKey)
-            if (soundList.Contains(sound))
-                soundList.Remove(sound);
+        foreach (var item in 
+                 this._soundsByKey.Where(item => item.Value.Contains(sound)))
+            item.Value.Remove(sound);
         
         Entry.LogSource.LogWarning("New keybind: " + newKey + " for " + sound.Name);
         // add new

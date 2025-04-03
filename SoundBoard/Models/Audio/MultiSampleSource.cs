@@ -37,7 +37,7 @@ public class MultiSampleSource
             _original = null!;
             return;
         }
-
+        
         var reader = new WaveStreamReader(waveStream);
         _original = reader.ReadAudioStream();
     }
@@ -52,8 +52,8 @@ public class MultiSampleSource
     /// </summary>
     public void ResetAll()
     {
-        foreach (var (_, audio) in _resampledBuffers)
-            audio?.Reset();
+        foreach (var item in _resampledBuffers)
+            item.Value?.Reset();
     }
 
     /// <summary>

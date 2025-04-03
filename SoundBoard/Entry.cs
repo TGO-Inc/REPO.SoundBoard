@@ -1,8 +1,9 @@
-using System.Reflection;
+using System.Diagnostics;
 using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
-using Shared.Game;
+using Shared;
+using UnityEngine;
 
 namespace SoundBoard;
 
@@ -18,11 +19,9 @@ internal sealed class Entry : BaseUnityPlugin
     internal static ManualLogSource LogSource { get; } = BepInEx.Logging.Logger.CreateLogSource(PluginGuid);
     
     public static readonly Core.SoundBoard SoundBoard = new();
-    
-    private void Awake()
+
+    static Entry()
     {
-        AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
-        
         SentrySdk.Init(options =>
         {
             // A Sentry Data Source Name (DSN) is required.
@@ -40,27 +39,27 @@ internal sealed class Entry : BaseUnityPlugin
             options.IsGlobalModeEnabled = false;
             // Send stack trace for events that were not created from an exception
             // e.g: CaptureMessage, log.LogDebug, log.LogInformation ...
-            options.AttachStacktrace = true;
+            options.AttachStacktrace = false;
             // Disable file write to avoid writing files to the disk.
-            options.DisableFileWrite = true;
+            // options.DisableFileWrite = true;
             // Set StackTraceMode to Enhanced to get more information about the stack trace.
             options.StackTraceMode = StackTraceMode.Enhanced;
             // This option tells Sentry to capture 100% of traces. You still need to start transactions and spans.
             options.TracesSampleRate = 1.0;
+            // Release
+            options.Release = $"{PluginName}@{PluginVersion}";
         });
-        
-        SentrySdk.ConfigureScope(scope =>
-        {
-            scope.Level = SentryLevel.Warning;
-        });
-        
-        Harmony.PatchAll();
-        SoundBoard.Initialize();
+
+        SentrySdk.ConfigureScope(scope => { scope.Level = SentryLevel.Warning; });
+        API.OnException += OnException;
     }
 
-    private void CurrentDomainOnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private static void OnException(Exception obj, LogType logType) 
+        => SentrySdk.CaptureException(obj);
+
+    private void Awake()
     {
-        var ex = e.ExceptionObject as Exception ?? new Exception("Exception object is not Exception?");
-        SentrySdk.CaptureException(ex);
+        Harmony.PatchAll();
+        SoundBoard.Initialize();
     }
 }

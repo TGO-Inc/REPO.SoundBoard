@@ -113,7 +113,7 @@ public class SettingsPageSoundItem : ISoundItem
                 CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(0, 1), borderThickness, borderColor, "LeftLine");
             }
 
-            throw new UnityException("TEST");
+            throw new ApplicationException("Some exception here");
             
             return _keyBindButton.rectTransform;
         }, -40, 0);

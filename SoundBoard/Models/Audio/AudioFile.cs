@@ -4,13 +4,13 @@ namespace SoundBoard.Models.Audio;
 /// A short-lived audio file wrapper.
 /// </summary>
 /// <param name="FullName"><see cref="string"/></param>
-public record AudioFile(string FullName) : IDisposable, IAsyncDisposable
+public record AudioFile(string FullName) : IDisposable
 {
     public string FullName { get; } = FullName;
     public Stream Stream { get; } = new FileStream(FullName, FileMode.Open, FileAccess.Read);
     public AudioFormat GuessedType { get; } = GuessTypeFromName(FullName);
     public void Dispose() => Stream.Dispose();
-    public async ValueTask DisposeAsync() => await Stream.DisposeAsync();
+    // public async ValueTask DisposeAsync() => await Stream.Dispose();
     
     /// <summary>
     /// Guesses the audio file type from the given name.
@@ -20,7 +20,7 @@ public record AudioFile(string FullName) : IDisposable, IAsyncDisposable
     public static AudioFormat GuessTypeFromName(string name)
     {
         var ext = Path.GetExtension(name).ToLowerInvariant();
-        return SupportedExtensions.GetValueOrDefault(ext, AudioFormat.UNKNOWN);
+        return SupportedExtensions.TryGetValue(ext, out var ret) ? ret : AudioFormat.UNKNOWN;
     }
     
     /// <summary>

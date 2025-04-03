@@ -33,7 +33,7 @@ public static class ResamplingService
         var samplesWritten = reSampler.ResampleOut(outputBuffer, 0, Math.Min(inputLength, numToProcess), outputLength, 1);
         
         Entry.LogSource.LogWarning("Resampled " + samplesWritten + " samples from " + input.SampleRate + " to " + outputSampleRate);
-        return new AudioStream(outputBuffer[..samplesWritten], outputSampleRate);
+        return new AudioStream(outputBuffer, outputSampleRate);
     }
     
     public static void ResampleMonoAsync(IAudioStream input, int outputSampleRate, Action<IAudioStream> callback)

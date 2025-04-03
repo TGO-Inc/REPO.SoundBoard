@@ -2,6 +2,7 @@ namespace SoundBoard.Models.Audio;
 
 public class AudioStream(float[] audio, int sampleRate) : IAudioStream
 {
+    public bool EndOfStream => Position >= Length && Length > 0;
     public void Reset() => Position = 0;
 
     public int Read(float[] buffer, int count, bool advance)
