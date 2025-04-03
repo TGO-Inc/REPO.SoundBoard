@@ -44,10 +44,10 @@ internal sealed class Entry : BaseUnityPlugin
             // options.DisableFileWrite = true;
             // Set StackTraceMode to Enhanced to get more information about the stack trace.
             options.StackTraceMode = StackTraceMode.Enhanced;
-            // This option tells Sentry to capture 100% of traces. You still need to start transactions and spans.
-            options.TracesSampleRate = 1.0;
             // Release
+            #if !DEBUG 
             options.Release = $"{PluginName}@{PluginVersion}";
+            #endif
         });
 
         SentrySdk.ConfigureScope(scope => { scope.Level = SentryLevel.Warning; });
