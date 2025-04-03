@@ -1,34 +1,48 @@
-using System.Windows.Input;
 using MenuLib;
 using MenuLib.MonoBehaviors;
-using SoundBoard.Models.Sources;
+using SoundBoard.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SoundBoard.Models.UI;
 
-public class SettingsPageSoundItem
+public class SettingsPageSoundItem : ISoundItem
 {
-    private readonly StaticSource _source;
-    private readonly List<MonoBehaviour> _elements = [];
+    public readonly string Name;
+    public float Volume;
+    public ConsoleKey Key;
+    public bool State;
+    
+    public event Action<ConsoleKey>? OnKeyBindChanged;
+    public event Action<float>? OnVolumeChanged;
+    public event Action<bool>? OnBehaviorChanged;
+    
     private REPOButton? _keyBindButton;
-    private bool buttonBehavior = true;
-
-    private SettingsPageSoundItem(StaticSource source)
+    private SettingsPageSoundItem(string name, float volume, ConsoleKey key, bool state)
     {
-        _source = source;
+        Name = name;
+        Volume = volume;
+        Key = key;
+        State = state;
     }
     
-    private void VolumeChanged(float value) => _source.Volume = value;
+    private void VolumeChanged(float volume)
+    {
+        Volume = volume;
+        this.OnVolumeChanged?.Invoke(volume);
+    }
+    
+    private void BehaviorChanged(bool behavior)
+    {
+        State = behavior;
+        this.OnBehaviorChanged?.Invoke(behavior);
+    }
     
     public IEnumerable<(REPOPopupPage.ScrollViewBuilderDelegate, int paddingTop, int paddingBottom)> Init()
     {
-        if (_elements.Count > 0)
-            yield break;
-
         yield return (parent =>
         {
-            var label = MenuAPI.CreateREPOLabel(Path.GetFileNameWithoutExtension(_source.Name), parent.transform, new Vector2(-3, 0));
+            var label = MenuAPI.CreateREPOLabel(Name, parent.transform, new Vector2(-3, 0));
             label.labelTMP.fontSize = 15;
             label.labelTMP.color = Color.white;
             label.labelTMP.margin = Vector4.zero;
@@ -39,7 +53,8 @@ public class SettingsPageSoundItem
         {
             var volumeSlider = MenuAPI.CreateREPOSlider("Volume", "", VolumeChanged,
                 parent.transform, new Vector2(35, 0), 0f, 200f, 1,
-                100f, barBehavior: REPOSlider.BarBehavior.UpdateWithValue);
+                Volume, barBehavior: REPOSlider.BarBehavior.UpdateWithValue);
+            
             volumeSlider.labelTMP.fontSize = 12;
             volumeSlider.transform.localScale = new Vector2(0.85f, 0.8f);
             return volumeSlider.rectTransform;
@@ -47,8 +62,8 @@ public class SettingsPageSoundItem
         
         yield return (parent =>
         {
-            var button = MenuAPI.CreateREPOToggle("Behavior", s => buttonBehavior = s, parent.transform, new Vector2(35, 0),
-                "Toggle", "Play", true);
+            var button = MenuAPI.CreateREPOToggle("Behavior", BehaviorChanged, parent.transform, new Vector2(35, 0),
+                "Play", "Toggle", State);
             button.labelTMP.transform.localScale = new Vector2(0.8f, 0.8f);
             button.labelTMP.transform.localPosition -= new Vector3(23, 0, 0);
             button.transform.localScale = new Vector2(0.85f, 0.8f);
@@ -57,9 +72,18 @@ public class SettingsPageSoundItem
         
         yield return (parent =>
         {
-            _keyBindButton = MenuAPI.CreateREPOButton("F1", () => Entry.SoundBoard.GetNewKeyBind(OnKeyBindChanged), parent.transform, new Vector2(-5, 0));
+            _keyBindButton = MenuAPI.CreateREPOButton("", () =>
+            {
+                Entry.SoundBoard.GetNewKeyBind(k => KeyBindChanged(k));
+                _keyBindButton!.labelTMP.text = "_";
+                _keyBindButton.labelTMP.fontSize = 28;
+            }, parent.transform, new Vector2(-5, 0));
+            
             _keyBindButton.labelTMP.fontSize = 28;
+            _keyBindButton.overrideButtonSize = new Vector2(34.5f, 40);
 
+            KeyBindChanged(Key, false);
+            
             {
                 const float borderThickness = 1.25f;
                 var borderColor = new Color(12f/256,76f/256,200f/256, 1f);
@@ -88,11 +112,15 @@ public class SettingsPageSoundItem
                 CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(1, 0), borderThickness, borderColor, "BottomLine");
                 CreateLine(borderContainer.transform, new Vector2(0, 0), new Vector2(0, 1), borderThickness, borderColor, "LeftLine");
             }
+
+            throw new UnityException("TEST");
             
             return _keyBindButton.rectTransform;
         }, -40, 0);
 
         yield return (parent => MenuAPI.CreateREPOSpacer(parent).rectTransform, 5, 0);
+        
+        
     }
 
     private static void CreateLine(Transform parent, Vector2 anchorMin, Vector2 anchorMax, float thickness, Color color, string name)
@@ -120,13 +148,45 @@ public class SettingsPageSoundItem
         }
     }
     
-    private void OnKeyBindChanged(ConsoleKey key)
+    private void KeyBindChanged(ConsoleKey key, bool signal = true)
     {
+        if (signal)
+            this.OnKeyBindChanged?.Invoke(key);
+        
         if (_keyBindButton is null)
             return;
 
-        _keyBindButton.labelTMP.text = key.ToString();
+        var str = key switch
+        {
+            ConsoleKey.NoName => "_",
+            _ => key.ToString()
+        };
+        _keyBindButton.labelTMP.text = str;
+        
+        const int startingFontSize = 28;
+        const int startingLengthThreshold = 2;
+        const int iterations = 6;
+
+        for (var i = 0; i < iterations; i++)
+        {
+            // Calculate font size: 28 -> 24 -> 20 -> 18 -> 16
+            var fontSize = startingFontSize - i * 3;
+            _keyBindButton.labelTMP.fontSize = fontSize;
+        
+            // Calculate length threshold: 2 -> 4 -> 6 -> 8 -> 10
+            var lengthThreshold = startingLengthThreshold + i;
+        
+            if (str.Length < lengthThreshold)
+                return;
+        }
     }
 
-    public static SettingsPageSoundItem CreateAndBind(StaticSource source) => new(source);
+    public static SettingsPageSoundItem CreateAndBind(SoundItemInit soundItemInit)
+    {
+        var item = new SettingsPageSoundItem(soundItemInit.Name, soundItemInit.Volume, soundItemInit.Key, soundItemInit.State);
+        item.OnKeyBindChanged += soundItemInit.OnKeyBindChanged;
+        item.OnVolumeChanged += soundItemInit.OnVolumeChanged;
+        item.OnBehaviorChanged += soundItemInit.OnBehaviorChanged;
+        return item;
+    }
 }

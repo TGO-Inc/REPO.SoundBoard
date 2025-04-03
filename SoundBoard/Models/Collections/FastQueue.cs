@@ -1,4 +1,3 @@
-using System.Buffers;
 using System.Collections.Concurrent;
 using SoundBoard.Models.Audio;
 
@@ -7,13 +6,12 @@ namespace SoundBoard.Models.Collections;
 /// <summary>
 /// Fully thread-safe fast queue for audio data.
 /// </summary>
-public class FastQueue
+public class FastQueue(FastMemory memManager)
 {
     private long _bigArrayIndex = 0;
     private long _bigArrayOffset = 0;
     private readonly ConcurrentQueue<AudioSample> _queue = [];
     private readonly float[] _bigArray = new float[short.MaxValue];
-    private readonly ArrayPool<float> _floatArrayPool = ArrayPool<float>.Shared;
     private static void WrapCopy(
         float[] source,
         long sourceIndex,
@@ -93,18 +91,10 @@ public class FastQueue
     }
 
     private void IncrementIndex(int amt)
-    {
-        Interlocked.Add(ref _bigArrayIndex, amt);
-        // if (_bigArrayIndex >= _bigArray.Length)
-        //     Interlocked.Add(ref _bigArrayIndex, -_bigArray.Length);
-    }
+        => Interlocked.Add(ref _bigArrayIndex, amt);
     
     private void IncrementOffset(int amt)
-    {
-        Interlocked.Add(ref _bigArrayOffset, amt);
-        // if (_bigArrayOffset >= _bigArray.Length)
-        //     Interlocked.Add(ref _bigArrayOffset, -_bigArray.Length);
-    }
+        => Interlocked.Add(ref _bigArrayOffset, amt);
     
     private void Work()
     {
@@ -112,16 +102,9 @@ public class FastQueue
         {
             WrapCopy(sample.Audio, 0, this._bigArray, this._bigArrayIndex, sample.Length);
             IncrementIndex(sample.Length);
-            this._floatArrayPool.Return(sample.Audio, true);
+            memManager.FreeArray(sample.Audio);
         }
     }
-    
-    /// <summary>
-    /// Create a new audio buffer.
-    /// </summary>
-    /// <param name="length"><see cref="int"/></param>
-    /// <returns></returns>
-    public float[] NewArray(int length) => this._floatArrayPool.Rent(length);
     
     /// <summary>
     /// Check if the queue has at least a certain amount of audio data.
@@ -159,10 +142,4 @@ public class FastQueue
     /// The total active length of the queue.
     /// </summary>
     public long Count => this._bigArrayIndex - this._bigArrayOffset;
-    
-    /// <summary>
-    /// Free an audio buffer.
-    /// </summary>
-    /// <param name="audioBuf"><see cref="float"/>[]</param>
-    public void FreeArray(float[] audioBuf) => this._floatArrayPool.Return(audioBuf, true);
 }

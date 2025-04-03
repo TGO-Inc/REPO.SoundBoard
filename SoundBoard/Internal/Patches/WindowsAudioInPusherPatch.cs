@@ -1,7 +1,6 @@
 using HarmonyLib;
 using Photon.Voice.Windows;
 using SoundBoard.Core;
-using SoundBoard.Helpers;
 using SoundBoard.Models.Audio;
 
 namespace SoundBoard.Internal.Patches;
@@ -9,6 +8,8 @@ namespace SoundBoard.Internal.Patches;
 [HarmonyPatch(typeof(WindowsAudioInPusher))]
 internal class WindowsAudioInPusherPatch
 {
+    private static SoundEngine? SoundEngine => SoundEngine.Instance;
+    
     [HarmonyPrefix]
     [HarmonyPatch("SetCallback")]
     public static void SetCallback(WindowsAudioInPusher __instance, ref Action<short[]> callback)
@@ -16,11 +17,9 @@ internal class WindowsAudioInPusherPatch
         var original = callback;
         callback = buffer =>
         {
-            // invoke extension
-            if (SoundEngine.Instance is not null && SoundEngine.Instance.IsAnyAudioPlaying)
-                AudioMixer.MixAudio(buffer, SoundEngine.Instance);
+            // if (SoundEngine is not null && SoundEngine.IsAnyAudioPlaying)
+            //     AudioMixer.MixAudio(buffer, SoundEngine);
             
-            // invoke original
             original?.Invoke(buffer);
         };
     }

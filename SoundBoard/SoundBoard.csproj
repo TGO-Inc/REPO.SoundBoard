@@ -9,131 +9,152 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="0Harmony">
-        <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\0Harmony.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Assembly-CSharp">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Assembly-CSharp.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="BepInEx">
-        <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="MenuLib">
-        <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\cache\nickklmao-MenuLib\2.1.2\MenuLib.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Mono.Cecil">
-        <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\Mono.Cecil.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Photon3Unity3D">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Photon3Unity3D.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonChat">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonChat.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonRealtime">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonRealtime.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonUnityNetworking">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonUnityNetworking.Utilities">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.Utilities.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonVoice">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonVoice.API">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.API.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="PhotonVoice.PUN">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.PUN.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="REPOLib">
-        <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\plugins\Zehs-REPOLib\REPOLib.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="Unity.TextMeshPro">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Unity.TextMeshPro.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.AudioModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.CoreModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.ImageConversionModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.IMGUIModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.InputLegacyModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.InputModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.InputModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.TextCoreFontEngineModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.TextCoreTextEngineModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.TextRenderingModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.UI">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UI.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.UIElementsModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
-      <Reference Include="UnityEngine.UIModule">
-        <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UIModule.dll</HintPath>
-        <Private>false</Private>
-      </Reference>
+        <Reference Include="0Harmony">
+            <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\0Harmony.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Assembly-CSharp">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Assembly-CSharp.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="BepInEx">
+            <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\BepInEx.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="MenuLib">
+            <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\cache\nickklmao-MenuLib\2.1.2\MenuLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Mono.Cecil">
+            <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\core\Mono.Cecil.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Photon3Unity3D">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Photon3Unity3D.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonChat">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonChat.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonRealtime">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonRealtime.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonUnityNetworking">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonUnityNetworking.Utilities">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.Utilities.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonVoice">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonVoice.API">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.API.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="PhotonVoice.PUN">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.PUN.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="REPOLib">
+            <HintPath>..\..\..\.config\r2modmanPlus-local\REPO\profiles\Default\BepInEx\plugins\Zehs-REPOLib\REPOLib.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Unity.TextMeshPro">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.AudioModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.CoreModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.ImageConversionModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.IMGUIModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputLegacyModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.InputModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextCoreFontEngineModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextCoreTextEngineModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.TextRenderingModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UI">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UI.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIElementsModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="UnityEngine.UIModule">
+            <HintPath>..\..\..\..\..\mnt\2TB_NVME\SteamLibrary\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+            <Private>false</Private>
+        </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Windows.Compatibility" Version="10.0.0-preview.2.25163.3" />
-      <PackageReference Include="NAudio" Version="2.2.1" PrivateAssets="false"/>
-      <PackageReference Include="NAudio.Vorbis" Version="1.5.0" PrivateAssets="false"/>
-      <PackageReference Include="NAudio.Wasapi" Version="22.0.0" PrivateAssets="false"/>
-      <PackageReference Include="System.Memory" Version="4.6.2" PrivateAssets="false"/>
+        <PackageReference Include="Microsoft.Windows.Compatibility" Version="10.0.0-preview.2.25163.3" />
+        <PackageReference Include="NAudio" Version="2.2.1" PrivateAssets="false"/>
+        <PackageReference Include="NAudio.Vorbis" Version="1.5.0" PrivateAssets="false"/>
+        <PackageReference Include="NAudio.Wasapi" Version="22.0.0" PrivateAssets="false"/>
+        <PackageReference Include="Sentry" Version="14.12.1-dump1" />
+        <PackageReference Include="System.Memory" Version="4.6.2" PrivateAssets="false"/>
+        <PackageReference Include="System.Reflection.Metadata" Version="10.0.0-preview.2.25163.2" />
+        <PackageReference Include="System.Text.Json" Version="10.0.0-preview.2.25163.2" />
     </ItemGroup>
-  
-  <!-- Copy DLL to Gale Zehs-REPOLib plugin folder -->
-  <Target Name="CopyToGalePluginFolder" AfterTargets="PostBuildEvent">
-    <Copy DestinationFolder="/home/theguy920/.config/r2modmanPlus-local/REPO/profiles/Default/BepInEx/plugins/TheGuy920-SoundBoard/" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)" />
-  </Target>
-  
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\REPO_MenuManager\ModdedMenu\ModdedMenu.csproj" Private="false" />
+        <ProjectReference Include="..\..\REPO_Mods\Shared\Shared.csproj" Private="false" />
+    </ItemGroup>
+
+    <!-- Copy all files in the build directory to the plugin folder -->
+<!--    <Target Name="CopyToPluginFolder" AfterTargets="PostBuildEvent">-->
+<!--        &lt;!&ndash; Include all files recursively from the output directory &ndash;&gt;-->
+<!--        <ItemGroup>-->
+<!--            <AllOutputFiles Include="$(TargetDir)**\*.dll" />-->
+<!--        </ItemGroup>-->
+<!--        <Copy SourceFiles="@(AllOutputFiles)"-->
+<!--              DestinationFolder="/home/theguy920/.config/r2modmanPlus-local/REPO/profiles/Default/BepInEx/plugins/TheGuy920-SoundBoard/"-->
+<!--              OverwriteReadOnlyFiles="true"-->
+<!--              SkipUnchangedFiles="true" />-->
+<!--    </Target>-->
+
+    <!-- Copy DLL to plugin folder -->
+    <Target Name="CopyToPluginFolder" AfterTargets="PostBuildEvent">
+        <Copy DestinationFolder="/home/theguy920/.config/r2modmanPlus-local/REPO/profiles/Default/BepInEx/plugins/TheGuy920-SoundBoard/"
+              OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" SourceFiles="$(TargetPath)"/>
+    </Target>
+
 </Project>

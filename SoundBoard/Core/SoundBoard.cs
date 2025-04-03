@@ -1,34 +1,31 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-using SoundBoard.Helpers;
+using Shared.Game;
+using SoundBoard.Internal.Helpers;
 using SoundBoard.Models.Audio;
-using SoundBoard.Models.Game;
 
 namespace SoundBoard.Core;
 
 /// <summary>
 /// The Sound Board persists until the game is closed.
 /// </summary>
-internal sealed class SoundBoard : IPersistantMonoBehaviour
+internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
 {
-    public IEnumerable<UserSound> Sounds => _sounds;
+    public UserSound[] Sounds = [];
     private readonly ConcurrentBag<UserSound> _sounds = [];
+    private readonly Dictionary<ConsoleKey, List<UserSound>> _soundsByKey = [];
     private SoundEngine? _soundEngine;
 
-    public void Awake()
+    protected override void Awake()
     {
         this.PreLoadAudioFiles();
-        KeyHelper.OnKeyStateChanged += OnKeyStateChanged;
+        Keyboard.OnKeyStateChanged += OnKeyStateChanged;
         Entry.LogSource.LogInfo($"Finished setup.");
     }
 
     internal void RegisterSoundEngine(PlayerVoiceChat instance)
     {
         this._soundEngine = instance.gameObject.AddComponent<SoundEngine>();
-
-        foreach (var sound in _sounds)
-            this._soundEngine.AddStaticSource(sound.AudioSource);
-        
         this._soundEngine.Init();
     }
     
@@ -38,17 +35,20 @@ internal sealed class SoundBoard : IPersistantMonoBehaviour
 
         foreach (var path in FetchValidFiles())
         {
-            var userSound = UserSound.CreateFromPath(path);
-            if (userSound.AudioSource.Length == 0)
+            var userSound = UserSound.CreateFromPath(path, OnChangeKeyBind);
+            if (userSound.Source.Length == 0)
                 continue;
             
             this._sounds.Add(userSound);
-            Entry.LogSource.LogInfo($"Loaded \"{userSound.AudioSource.Name}\"");
+            Entry.LogSource.LogInfo($"Loaded \"{userSound.Name}\"");
         }
+        
+        this.Sounds = this._sounds.ToArray();
     }
-
+    
     public static readonly string AudioDirectory =
         Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Audio");
+    
     private static IEnumerable<string> FetchValidFiles()
     {
         // TODO: Implement fetching audio files.
@@ -63,33 +63,51 @@ internal sealed class SoundBoard : IPersistantMonoBehaviour
 
     public void GetNewKeyBind(Action<ConsoleKey> callback)
     {
-        if (_newKeyBind != null)
+        if (this._newKeyBind != null)
             return;
         
-        Entry.LogSource.LogInfo($"Adding new key bind. {this}");
-        _newKeyBind = callback;
+        this._newKeyBind = callback;
     }
 
     public void CancelNewKeyBind()
     {
-        _newKeyBind = null;
+        this._newKeyBind = null;
     }
 
     private Action<ConsoleKey>? _newKeyBind = null;
     private void OnKeyStateChanged(ConsoleKey key, bool state)
     {
-        Entry.LogSource.LogInfo($"Key {key}: {(state ? "pressed" : "released")}");
-        
-        if (_newKeyBind == null || !state)
+        if (!state)
             return;
         
-        Entry.LogSource.LogInfo($"Key {key} is now bound.");
-        _newKeyBind(key);
-        _newKeyBind = null;
+        if (this._newKeyBind is not null)
+        {
+            this._newKeyBind?.Invoke(key);
+            this._newKeyBind = null;
+            return;
+        }
+
+        if (!this._soundsByKey.TryGetValue(key, out var userSounds)) return;
+        
+        foreach (var sound in userSounds)
+            sound.Signal();
     }
     
-    private void Update()
+    private void OnChangeKeyBind(UserSound sound, ConsoleKey newKey)
     {
-        KeyHelper.Poll();
+        // remove old
+        foreach (var (_, soundList) in this._soundsByKey)
+            if (soundList.Contains(sound))
+                soundList.Remove(sound);
+        
+        Entry.LogSource.LogWarning("New keybind: " + newKey + " for " + sound.Name);
+        // add new
+        if (this._soundsByKey.TryGetValue(newKey, out var userSounds))
+            userSounds.Add(sound);
+        else
+            this._soundsByKey.Add(newKey, [sound]);
     }
+    
+    protected override void FixedUpdate() => Keyboard.Poll();
 }
+

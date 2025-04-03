@@ -11,8 +11,9 @@ namespace SoundBoard.Internal.Patches;
 [HarmonyPatch(typeof(MenuPageSettings))]
 public class MenuPageSettingsPatch
 {
-    public static REPOPopupPage SoundBoardPage { get; private set; } = null!;
+    private static REPOPopupPage SoundBoardPage { get; set; } = null!;
     private static Core.SoundBoard SoundBoard => Entry.SoundBoard;
+    private static MenuManager MenuManager => MenuManager.instance;
     
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
@@ -41,7 +42,7 @@ public class MenuPageSettingsPatch
 
         var button = MenuAPI.CreateREPOButton("Sound Board", () =>
         {
-            MenuManager.instance.PageCloseAllAddedOnTop();
+            MenuManager.PageCloseAllAddedOnTop();
             SoundBoardPage.OpenPage(true);
         }, __instance.transform, pos);
         
