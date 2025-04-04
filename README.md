@@ -21,3 +21,11 @@ Restart your game. Next revision I will add a file watcher
 Restart your pc and pray 🙏
 
 * Make a bug report by opening an issue here in GitHub
+
+# Other libraries
+
+- ![REPO.ModdedMenu](https://github.com/TGO-Inc/REPO.ModdedMenu)
+
+- ![REPO.Shared](https://github.com/TGO-Inc/REPO.Shared)
+
+- ![UnityModPackager](https://github.com/TGO-Inc/UnityModPackager)
