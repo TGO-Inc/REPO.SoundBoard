@@ -59,7 +59,6 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
     
     private static IEnumerable<string> FetchValidFiles()
     {
-        // TODO: Implement fetching audio files.
         var directoryInfo = new DirectoryInfo(AudioDirectory);
 
         foreach (var file in directoryInfo.GetFiles())

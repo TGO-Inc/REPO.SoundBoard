@@ -49,7 +49,7 @@ internal sealed class Entry : BaseUnityPlugin
 
     private void Awake()
     {
-        Harmony.PatchAll();
-        SoundBoard.Initialize();
+        // Harmony.PatchAll();
+        // SoundBoard.Initialize();
     }
 }

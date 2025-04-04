@@ -51,30 +51,17 @@ public class UserSound
     /// <summary>
     /// Play the audio source.
     /// </summary>
-    public void Play()
-    {
-        IsPlaying = true;
-        Entry.LogSource.LogInfo("Playing : " + Name);
-    }
+    public void Play() => IsPlaying = true;
     
     /// <summary>
     /// Stop the audio source.
     /// </summary>
-    public void Stop()
-    {
-        if (IsPlaying)
-            Entry.LogSource.LogInfo("Stopping : " + Name);
-        IsPlaying = false;
-    }
+    public void Stop() => IsPlaying = false;
 
     /// <summary>
     /// Toggle (Play/Stop) the audio source.
     /// </summary>
-    public void Toggle()
-    {
-        IsPlaying = !IsPlaying;
-        Entry.LogSource.LogInfo("Toggling : " + Name + " : " + IsPlaying);
-    }
+    public void Toggle() => IsPlaying = !IsPlaying;
 
     /// <summary>
     /// Reset the audio source to the beginning.

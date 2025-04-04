@@ -37,7 +37,7 @@ public class SoundEngine : MonoBehaviour
         this._recorder.FrameDuration = OpusCodec.FrameDuration.Frame20ms;
         this._recorder.ReliableMode = true;
         
-        Entry.LogSource.LogWarning("SoundEngine has been initialized.");
+        Entry.LogSource.LogInfo("SoundEngine has been initialized.");
         return true;
     }
 

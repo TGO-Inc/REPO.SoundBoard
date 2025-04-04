@@ -31,8 +31,6 @@ public static class ResamplingService
         
         // Perform resampling
         var samplesWritten = reSampler.ResampleOut(outputBuffer, 0, Math.Min(inputLength, numToProcess), outputLength, 1);
-        
-        Entry.LogSource.LogWarning("Resampled " + samplesWritten + " samples from " + input.SampleRate + " to " + outputSampleRate);
         return new AudioStream(outputBuffer, outputSampleRate);
     }
     
