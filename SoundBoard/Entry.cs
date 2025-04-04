@@ -40,16 +40,17 @@ internal sealed class Entry : BaseUnityPlugin
         API.OnException += OnException;
     }
 
+    private static string AsmRefName = typeof(Entry).Namespace!.ToLowerInvariant();
     private static void OnException(Exception obj, LogType logType)
     {
         var message = $"{obj.Message}{obj.Source}{obj.StackTrace}";
-        if (!message.ToLowerInvariant().Contains(typeof(Entry).Namespace!.ToLowerInvariant())) return;
+        if (!message.ToLowerInvariant().Contains(AsmRefName)) return;
         SentrySdk.CaptureException(obj);
     }
 
     private void Awake()
     {
-        // Harmony.PatchAll();
-        // SoundBoard.Initialize();
+        Harmony.PatchAll();
+        SoundBoard.Initialize();
     }
 }
