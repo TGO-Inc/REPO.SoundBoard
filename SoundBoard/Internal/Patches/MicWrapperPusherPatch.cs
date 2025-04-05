@@ -11,9 +11,9 @@ namespace SoundBoard.Internal.Patches;
 [HarmonyPatch(typeof(MicWrapperPusher))]
 internal class MicWrapperPusherPatch
 {
-    private static SoundEngine? SoundEngine => SoundEngine.Instance;
     private static readonly ConcurrentDictionary<MicWrapperPusher, int> OldChannels = [];
-    
+    private static SoundEngine? SoundEngine => SoundEngine.Instance;
+
     [HarmonyPrefix]
     [HarmonyPatch("SetCallback")]
     private static void SetCallback(MicWrapperPusher __instance, ref Action<float[]> callback)
@@ -22,11 +22,11 @@ internal class MicWrapperPusherPatch
         callback = buffer =>
         {
             if (SoundEngine is null || !OldChannels.TryGetValue(__instance, out var channels)) return;
-            
+
             // var resizedBuffer = new float[buffer.Length/channels];
             // for (var i = 0; i < buffer.Length; i += channels)
             //     resizedBuffer[i / channels] += buffer[i] / channels;
-            
+
             if (SoundEngine.IsAnyAudioPlaying)
                 AudioMixer.MixAudio(buffer, __instance.SamplingRate, channels, SoundEngine);
 
@@ -34,7 +34,7 @@ internal class MicWrapperPusherPatch
             original?.Invoke(buffer);
         };
     }
-    
+
     [HarmonyPostfix]
     [HarmonyPatch(MethodType.Constructor, typeof(GameObject), typeof(string), typeof(int), typeof(ILogger))]
     private static void Constructor(MicWrapperPusher __instance, ref int ___channels)

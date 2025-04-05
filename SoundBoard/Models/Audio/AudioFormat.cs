@@ -1,4 +1,5 @@
 namespace SoundBoard.Models.Audio;
+
 public enum AudioFormat
 {
     AAC,
@@ -12,5 +13,5 @@ public enum AudioFormat
     PCM,
     UNKNOWN,
     WAV,
-    WMA,
+    WMA
 }

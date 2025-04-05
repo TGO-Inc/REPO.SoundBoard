@@ -1,8 +1,3 @@
-using System.Collections.Concurrent;
-using HarmonyLib;
-using Photon.Voice;
-using Photon.Voice.Unity;
-
 namespace SoundBoard.Internal.Patches;
 
 // [HarmonyPatch(typeof(Recorder))]
