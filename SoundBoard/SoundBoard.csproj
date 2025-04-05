@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk" InitialTargets="CustomPreBuild">
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="GenerateNewTargets">
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -9,6 +9,9 @@
         <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+        <AssemblyVersion>1.0.2.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
+        <Version>1.0.2</Version>
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="0Harmony">
@@ -127,19 +130,43 @@
         <PackageReference Include="Sentry" Version="14.12.1-dump1" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\REPO_MenuManager\ModdedMenu\ModdedMenu.csproj" Private="false" />
         <ProjectReference Include="..\..\REPO_Mods\Shared\Shared.csproj" Private="false" />
     </ItemGroup>
     <Import Project="$(ProjectDir)../../REPO_Mods/main.targets" />
-    <Target Name="CustomPreBuild" BeforeTargets="Build">
+    <Target Name="GenerateNewTargets" BeforeTargets="Restore">
         <Exec Command="$(DotNetToolsDirectory)$(PathSeparator)UnityModPackager --pre" WorkingDirectory="$(ProjectDir)" />
     </Target>
     <Target Name="CustomPostBuild" AfterTargets="Build">
-        <Exec Command="$(DotNetToolsDirectory)$(PathSeparator)UnityModPackager --post" WorkingDirectory="$(ProjectDir)" />
         <ItemGroup>
             <AllOutputFiles Include="$(TargetDir)*.dll" />
         </ItemGroup>
         <Copy SourceFiles="@(AllOutputFiles)" DestinationFolder="$(CopyToDirOnBuild)%(RecursiveDir)" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="true" />
+    </Target>
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <DebugSymbols>false</DebugSymbols>
+        <DebugType>None</DebugType>
+    </PropertyGroup>
+    <Target Name="PostPublishCleanup" AfterTargets="Publish">
+        <ItemGroup>
+            <PublishedFiles Include="$(PublishDir)**\*" />
+        </ItemGroup>
+        <ItemGroup>
+            <FilesToDelete Include="@(PublishedFiles)">
+                <OutputItems Condition="!$([System.String]::Copy('%(Filename)').StartsWith('$(AssemblyName)'))">%(FullPath)</OutputItems>
+            </FilesToDelete>
+        </ItemGroup>
+        <Delete Files="@(FilesToDelete-&gt;'%(OutputItems)')" />
+        <ItemGroup>
+            <ConfigFilesToDelete Include="$(PublishDir)**\*.config" />
+        </ItemGroup>
+        <Delete Files="@(ConfigFilesToDelete)" />
+        <Copy SourceFiles="$(ProjectDir)..\README.md" DestinationFolder="$(PublishDir)" />
+        <Copy SourceFiles="$(ProjectDir)..\manifest.json" DestinationFolder="$(PublishDir)" />
+        <Copy SourceFiles="$(ProjectDir)..\icon.png" DestinationFolder="$(PublishDir)" />
+        <PropertyGroup>
+            <ZipFilePath>$(PublishDir)..\$(AssemblyName).zip</ZipFilePath>
+        </PropertyGroup>
+        <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(ZipFilePath)" Overwrite="true" />
     </Target>
     <Import Project="obj/GeneratedResources.targets" />
 </Project>
