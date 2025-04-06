@@ -8,7 +8,7 @@ namespace SoundBoard.Internal.Patches;
 internal class WebRTCAudioProcessorPatch
 {
     private static SoundEngine? SoundEngine => SoundEngine.Instance;
-    
+
     [HarmonyPostfix]
     [HarmonyPatch("Process", typeof(short[]))]
     private static void Process(ref short[] __result, short[] buf)

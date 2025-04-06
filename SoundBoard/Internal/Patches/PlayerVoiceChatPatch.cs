@@ -8,7 +8,7 @@ namespace SoundBoard.Internal.Patches;
 internal class PlayerVoiceChatPatch
 {
     private static SoundEngine? SoundEngine => SoundEngine.Instance;
-    
+
     [HarmonyPostfix]
     [HarmonyPatch("Start")]
     private static void Start(PlayerVoiceChat __instance, PhotonView ___photonView)
@@ -19,13 +19,14 @@ internal class PlayerVoiceChatPatch
 
     [HarmonyPrefix]
     [HarmonyPatch("FixedUpdate")]
-    private static void FixedUpdate(PlayerVoiceChat __instance, PhotonView ___photonView, ref float ___isTalkingTimer, ref bool ___isTalking)
+    private static void FixedUpdate(PlayerVoiceChat __instance, PhotonView ___photonView, ref float ___isTalkingTimer,
+        ref bool ___isTalking)
     {
         if (!___photonView.IsMine) return;
 
         if (SoundEngine is null || !SoundEngine.IsAnyAudioPlaying)
             return;
-        
+
         ___isTalkingTimer = 1f;
         ___isTalking = true;
     }

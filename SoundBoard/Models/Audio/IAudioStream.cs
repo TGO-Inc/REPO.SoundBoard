@@ -3,32 +3,32 @@ namespace SoundBoard.Models.Audio;
 public interface IAudioStream
 {
     /// <summary>
-    /// The number of floats in the stream.
+    ///     The number of floats in the stream.
     /// </summary>
     long Length { get; }
-    
+
     /// <summary>
-    /// The sample rate of the audio stream.
+    ///     The sample rate of the audio stream.
     /// </summary>
     long SampleRate { get; }
-    
+
     /// <summary>
-    /// The current position in the stream.
+    ///     The current position in the stream.
     /// </summary>
     long Position { get; }
 
     /// <summary>
-    /// Has the stream reached the end?
+    ///     Has the stream reached the end?
     /// </summary>
     bool EndOfStream { get; }
 
     /// <summary>
-    /// Resets the stream to the beginning.
+    ///     Resets the stream to the beginning.
     /// </summary>
     void Reset();
 
     /// <summary>
-    /// Reads a number of floats from the stream into the provided buffer.
+    ///     Reads a number of floats from the stream into the provided buffer.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="count"></param>
@@ -37,7 +37,7 @@ public interface IAudioStream
     int Read(float[] buffer, int count, bool advance);
 
     /// <summary>
-    /// Reads a number of floats from the stream into the provided buffer, starting at the specified offset.
+    ///     Reads a number of floats from the stream into the provided buffer, starting at the specified offset.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="offset"></param>

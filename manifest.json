@@ -1,0 +1,10 @@
+{
+    "name": "SoundBoard",
+    "version_number": "1.0.2",
+    "website_url": "https://github.com/TGO-Inc/REPO.SoundBoard",
+    "description": "A client-side audio mixer",
+    "dependencies": [
+        "BepInEx-BepInExPack-5.4.2100",
+        "TGO-REPOShared-1.0.1"
+    ]
+}

@@ -1,15 +1,14 @@
-using System.Collections.Concurrent;
 using HarmonyLib;
 using Photon.Voice.Unity;
-using SoundBoard.Models.Audio;
+using SoundBoard.Core;
 
 namespace SoundBoard.Internal.Patches;
 
 [HarmonyPatch(typeof(MicWrapper))]
 internal class MicWrapperPatch
 {
-    private static Core.SoundEngine? SoundEngine => Core.SoundEngine.Instance;
-    
+    private static SoundEngine? SoundEngine => SoundEngine.Instance;
+
     [HarmonyPostfix]
     [HarmonyPatch("Read")]
     private static void Read(MicWrapper __instance, float[] buffer, ref bool __result)

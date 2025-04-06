@@ -4,59 +4,59 @@ using Shared.Game;
 using SoundBoard.Core.Services;
 using SoundBoard.Internal.Helpers;
 using SoundBoard.Models.Audio;
-using SoundBoard.Models.UI;
 using UnityEngine;
 
 namespace SoundBoard.Core;
 
 /// <summary>
-/// The Sound Board persists until the game is closed.
+///     The Sound Board persists until the game is closed.
 /// </summary>
 internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
 {
-    public UserSound[] Sounds = [];
-    public readonly ConfigFileService FileService = new(Path.Combine(AudioDirectory, "audio.conf"));
-    
+    public static readonly string AudioDirectory =
+        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Audio");
+
     private readonly ConcurrentBag<UserSound> _sounds = [];
     private readonly Dictionary<KeyCode, List<UserSound>> _soundsByKey = [];
+    public readonly ConfigFileService FileService = new(Path.Combine(AudioDirectory, "audio.conf"));
+
+    private Action<KeyCode>? _newKeyBind;
     private SoundEngine? _soundEngine;
+    public UserSound[] Sounds = [];
 
     protected override void Awake()
     {
         FileService.Load();
         Task.Run(PreLoadAudioFiles);
         Keyboard.OnKeyStateChanged += OnKeyStateChanged;
-        Entry.LogSource.LogInfo($"Finished setup.");
+        Entry.LogSource.LogInfo("Finished setup.");
     }
 
     internal void RegisterSoundEngine(PlayerVoiceChat instance)
     {
-        this._soundEngine = instance.gameObject.AddComponent<SoundEngine>();
-        this._soundEngine.Init();
+        _soundEngine = instance.gameObject.AddComponent<SoundEngine>();
+        _soundEngine.Init();
     }
-    
+
     private void PreLoadAudioFiles()
     {
-        if (this._sounds.Count != 0) return;
+        if (_sounds.Count != 0) return;
 
         FileService.Load();
-        
+
         foreach (var path in FetchValidFiles())
         {
             var userSound = UserSound.CreateFromPath(path, OnChangeKeyBind);
             if (userSound.Source.Length == 0)
                 continue;
-            
-            this._sounds.Add(userSound);
+
+            _sounds.Add(userSound);
             Entry.LogSource.LogInfo($"Loaded \"{userSound.Name}\"");
         }
-        
-        this.Sounds = this._sounds.ToArray();
+
+        Sounds = _sounds.ToArray();
     }
-    
-    public static readonly string AudioDirectory =
-        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "Audio");
-    
+
     private static IEnumerable<string> FetchValidFiles()
     {
         var directoryInfo = new DirectoryInfo(AudioDirectory);
@@ -68,50 +68,51 @@ internal sealed class SoundBoard() : EarlyMonoBehaviour(true)
 
     public void GetNewKeyBind(Action<KeyCode> callback)
     {
-        if (this._newKeyBind != null)
+        if (_newKeyBind != null)
             return;
-        
-        this._newKeyBind = callback;
+
+        _newKeyBind = callback;
     }
 
     public void CancelNewKeyBind()
     {
-        this._newKeyBind = null;
+        _newKeyBind = null;
     }
 
-    private Action<KeyCode>? _newKeyBind = null;
     private void OnKeyStateChanged(KeyCode key, bool state)
     {
         if (!state)
             return;
-        
-        if (this._newKeyBind is not null)
+
+        if (_newKeyBind is not null)
         {
-            this._newKeyBind?.Invoke(key);
-            this._newKeyBind = null;
+            _newKeyBind?.Invoke(key);
+            _newKeyBind = null;
             return;
         }
 
-        if (!this._soundsByKey.TryGetValue(key, out var userSounds)) return;
-        
+        if (!_soundsByKey.TryGetValue(key, out var userSounds)) return;
+
         foreach (var sound in userSounds)
             sound.Signal();
     }
-    
+
     private void OnChangeKeyBind(UserSound sound, KeyCode newKey)
     {
         // remove old
-        foreach (var item in 
-                 this._soundsByKey.Where(item => item.Value.Contains(sound)))
+        foreach (var item in
+                 _soundsByKey.Where(item => item.Value.Contains(sound)))
             item.Value.Remove(sound);
-        
+
         // add new
-        if (this._soundsByKey.TryGetValue(newKey, out var userSounds))
+        if (_soundsByKey.TryGetValue(newKey, out var userSounds))
             userSounds.Add(sound);
         else
-            this._soundsByKey.Add(newKey, [sound]);
+            _soundsByKey.Add(newKey, [sound]);
     }
-    
-    protected override void Update() => Keyboard.Poll();
-}
 
+    protected override void Update()
+    {
+        Keyboard.Poll();
+    }
+}
