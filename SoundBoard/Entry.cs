@@ -2,6 +2,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using Sentry;
+using Sentry.Unity;
 using Shared;
 using UnityEngine;
 
@@ -22,28 +23,30 @@ internal sealed class Entry : BaseUnityPlugin
 
     static Entry()
     {
-        SentrySdk.Init(options =>
-        {
-            options.Dsn = "https://c433578e608a1f775af692c1f9c76acf@devsentry.theguy920.dev/4";
-            options.Debug = false;
-            options.AutoSessionTracking = true;
-            options.IsGlobalModeEnabled = true;
-            options.AttachStacktrace = false;
-            options.DisableFileWrite = true;
-            options.StackTraceMode = StackTraceMode.Enhanced;
-#if !DEBUG
-            options.Release = $"{PluginName}@{PluginVersion}";
-#endif
-        });
-
-        SentrySdk.ConfigureScope(scope => { scope.Level = SentryLevel.Warning; });
         API.OnException += OnException;
     }
 
     internal static ManualLogSource LogSource { get; } = BepInEx.Logging.Logger.CreateLogSource(PluginGuid);
-
+    internal static SentryUnitySdk? SentryLifetimeObject;
+    
     private void Awake()
     {
+        SentryLifetimeObject = SentryUnity.Init(options =>
+        {
+            options.Dsn = "https://c433578e608a1f775af692c1f9c76acf@devsentry.theguy920.dev/4";
+            options.AutoSessionTracking = true;
+            options.AttachStacktrace = false;
+            options.DisableFileWrite = true;
+#if !DEBUG
+            options.Release = $"{PluginName}@{PluginVersion}";
+            options.Environment = "production";
+#elif MEGA_DEBUG
+            options.Debug = true;
+            options.Environment = "development";
+            options.DiagnosticLevel = SentryLevel.Debug;
+#endif
+        });
+        
         Harmony.PatchAll();
         SoundBoard.Initialize();
     }
