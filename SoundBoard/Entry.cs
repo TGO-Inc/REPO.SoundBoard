@@ -3,13 +3,12 @@ using BepInEx.Logging;
 using HarmonyLib;
 using Sentry;
 using Sentry.Unity;
-using Shared;
-using UnityEngine;
+using Shared.Core.Converters;
 
 namespace SoundBoard;
 
 [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-[BepInDependency("tgo.shared", "1.0.0.0")]
+[BepInDependency("tgo.shared", "1.1.4.0")]
 internal sealed class Entry : BaseUnityPlugin
 {
     private const string PluginGuid = "tgo.soundboard";
@@ -19,42 +18,31 @@ internal sealed class Entry : BaseUnityPlugin
 
     public static readonly Core.SoundBoard SoundBoard = new();
 
-    private static readonly string AsmRefName = typeof(Entry).Namespace!.ToLowerInvariant();
-
-    static Entry()
-    {
-        API.OnException += OnException;
-    }
-
     internal static ManualLogSource LogSource { get; } = BepInEx.Logging.Logger.CreateLogSource(PluginGuid);
     internal static SentryUnitySdk? SentryLifetimeObject;
+    internal static SentrySdk? SentrySDK => SentryLifetimeObject!.SentrySdk;
     
     private void Awake()
     {
         SentryLifetimeObject = SentryUnity.Init(options =>
         {
             options.Dsn = "https://c433578e608a1f775af692c1f9c76acf@devsentry.theguy920.dev/4";
+            options.DiagnosticLogger = new BepLog2SenLog(LogSource, SentryLevel.Debug);
             options.AutoSessionTracking = true;
-            options.AttachStacktrace = false;
-            options.DisableFileWrite = true;
-#if !DEBUG
-            options.Release = $"{PluginName}@{PluginVersion}";
+#if GH_RELEASE
+            options.Release = $"GH-{PluginName}@{PluginVersion}";
             options.Environment = "production";
 #elif MEGA_DEBUG
             options.Debug = true;
             options.Environment = "development";
             options.DiagnosticLevel = SentryLevel.Debug;
+#elif !DEBUG
+            options.Release = $"{PluginName}@{PluginVersion}";
+            options.Environment = "production";
 #endif
         });
         
         Harmony.PatchAll();
         SoundBoard.Initialize();
-    }
-
-    private static void OnException(Exception obj, LogType logType)
-    {
-        var message = $"{obj.Message}{obj.Source}{obj.StackTrace}";
-        if (!message.ToLowerInvariant().Contains(AsmRefName)) return;
-        // SentrySdk.CaptureException(obj);
     }
 }
