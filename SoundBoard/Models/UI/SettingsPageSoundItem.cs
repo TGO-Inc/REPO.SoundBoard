@@ -147,6 +147,9 @@ public class SettingsPageSoundItem : ISoundItem
 
         if (_keyBindButton is null)
             return;
+        
+        if (key == KeyCode.Delete)
+            key = KeyCode.None;
 
         _config.Key = key;
         Entry.SoundBoard.FileService.UpdateSoundItem(_config.Name, _config);
